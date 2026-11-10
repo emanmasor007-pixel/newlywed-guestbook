@@ -79,7 +79,7 @@ create index if not exists idx_submissions_created on public.submissions(created
 -- Hijri date shown on the landing page. EDIT IT in Admin > Settings after
 -- verifying it against the official Malaysian Hijri calendar (JAKIM).
 insert into public.site_settings (key, value)
-values ('hijri_date', '9 Rajab 1448 H')
+values ('hijri_date', '10 Rejab 1448 H')
 on conflict (key) do nothing;
 
 -- ---------------------------------------------------------------------

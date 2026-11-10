@@ -480,7 +480,7 @@ export default function AdminDashboard() {
             <p className="mt-1 text-sm text-cocoa/65">
               Shown on the landing page under {WEDDING.dateLabel}. Confirm it against the official Malaysian Hijri calendar (JAKIM) before the wedding. Leave empty to hide it.
             </p>
-            <input className="field mt-4" value={hijriDraft} onChange={(e) => setHijriDraft(e.target.value)} placeholder="e.g. 9 Rajab 1448 H" maxLength={60} />
+            <input className="field mt-4" value={hijriDraft} onChange={(e) => setHijriDraft(e.target.value)} placeholder="e.g. 10 Rejab 1448 H" maxLength={60} />
             <button className="btn-gold mt-4" onClick={saveHijri}>
               <Save size={16} /> Save
             </button>

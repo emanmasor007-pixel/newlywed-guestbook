@@ -12,7 +12,7 @@ export const WEDDING = {
   isoDate: "2026-12-19",
   // Fallback only. The live value is read from the `site_settings` table
   // and can be edited in Admin > Settings.
-  hijriFallback: process.env.NEXT_PUBLIC_HIJRI_DATE || "9 Rajab 1448 H",
+  hijriFallback: process.env.NEXT_PUBLIC_HIJRI_DATE || "10 Rejab 1448 H",
 } as const;
 
 export const ADMIN_EMAIL = (
