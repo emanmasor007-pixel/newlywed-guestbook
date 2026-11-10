@@ -42,14 +42,16 @@ newlywed-guestbook/
 ### a) Install
 ```bash
 npm install
-cp .env.local.example .env.local   # then fill it in (step c)
 ```
+Copy `.env.example` to `.env.local` and replace the placeholders with your project values. Keep `.env.local` private; it is ignored by Git.
 
 ### b) Supabase
 1. Create a project at supabase.com.
 2. **SQL Editor → New query →** paste all of `supabase/schema.sql` → Run. This creates the tables, Row Level Security, the three **private** storage buckets and their policies.
-3. **Authentication → Users → Add user:** email `emanmasor007@gmail.com`, a strong password, tick *Auto Confirm User*.
-4. **Authentication → Providers → Email:** turn **off** "Allow new users to sign up" so nobody else can create an account.
+3. Guest entries are stored in `public.submissions`; this app does not use a separate `public.guests` table.
+4. Run `supabase/verify-rls.sql` to confirm that RLS is enabled and policies exist for the app's tables. `public.guests` should show `table_exists = false`.
+5. **Authentication → Users → Add user:** email `emanmasor007@gmail.com`, a strong password, tick *Auto Confirm User*.
+6. **Authentication → Providers → Email:** turn **off** "Allow new users to sign up" so nobody else can create an account.
 
 ### c) Environment variables (`.env.local`)
 
@@ -62,7 +64,7 @@ cp .env.local.example .env.local   # then fill it in (step c)
 | `RESEND_FROM_EMAIL` | your Resend sender | `onboarding@resend.dev` works for testing, but only delivers to the email that owns the Resend account (use that Gmail to sign up, or verify your own domain) |
 | `ADMIN_EMAIL` / `NEXT_PUBLIC_ADMIN_EMAIL` | `emanmasor007@gmail.com` | must match the SQL `is_admin()` function and the Auth user |
 | `NEXT_PUBLIC_SITE_URL` | your live URL | used for the QR code and email link |
-| `NEXT_PUBLIC_HIJRI_DATE` | optional | fallback only |
+| `NEXT_PUBLIC_HIJRI_DATE` | `10 Rejab 1448 H` | fallback shown when no database setting is available; in Vercel, set this for each deployment environment |
 
 ### d) Run
 ```bash
@@ -71,10 +73,12 @@ npm run dev      # http://localhost:3000
 Sign in at `/admin/login`.
 
 ### e) Deploy to Vercel
-1. Push the project to GitHub and import it in Vercel.
-2. Add every variable from the table above in **Project → Settings → Environment Variables**.
-3. Deploy, then set `NEXT_PUBLIC_SITE_URL` to the final domain and **redeploy** so the QR code points to it.
-4. Open `/admin/dashboard → QR code` and download or print the card.
+1. Import the GitHub repository in Vercel and set **Root Directory** to `newlywed-guestbook` (the Next.js app is in this subfolder).
+2. Keep the default install and build commands (`npm install` and `npm run build`).
+3. Add the variables from the table above in **Project → Settings → Environment Variables**. Use `10 Rejab 1448 H` as the `NEXT_PUBLIC_HIJRI_DATE` value; do not include quotes in Vercel's value field. Keep `SUPABASE_SERVICE_ROLE_KEY` server-only and never prefix it with `NEXT_PUBLIC_`.
+4. Make sure `NEXT_PUBLIC_SITE_URL` is the final domain, then deploy or redeploy. `NEXT_PUBLIC_*` values are embedded at build time.
+5. If the landing page shows the database value instead of the environment fallback, run `supabase/update-hijri-date.sql` in Supabase SQL Editor to set `site_settings.hijri_date` to `10 Rejab 1448 H`.
+6. Open `/admin/dashboard → QR code` and download or print the card.
 
 ## 3. How security works
 
@@ -86,7 +90,7 @@ Sign in at `/admin/login`.
 
 ## 4. Things to personalise
 
-* **Hijri date:** Admin → *Settings*. The default (`9 Rajab 1448 H`) is a **calendar estimate, not verified** — please confirm against the official Malaysian (JAKIM) calendar before the wedding.
+* **Hijri date:** `NEXT_PUBLIC_HIJRI_DATE` defaults to `10 Rejab 1448 H`; an existing `site_settings.hijri_date` value takes precedence. Edit it in Admin → *Settings* or run `supabase/update-hijri-date.sql`. Please confirm the date against the official Malaysian (JAKIM) calendar before the wedding.
 * **Background music:** `components/MusicProvider.tsx` plays `public/lagu-baru.mp3`. Replace that file to change the background track, or update `SRC` in the provider if you use a different filename.
 * **Music library:** drop MP3s into `public/music` and edit `lib/musicLibrary.ts`.
 * **Wishes templates / stickers / relationship list:** `lib/config.ts`.
